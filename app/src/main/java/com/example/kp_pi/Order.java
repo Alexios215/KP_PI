@@ -53,4 +53,8 @@ public class Order {
     public void setDate(String date) {
         this.orderDate = date;
     }
+
+    public String getDate() {
+        return appointmentDate;
+    }
 }

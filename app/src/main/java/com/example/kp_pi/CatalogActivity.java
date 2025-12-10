@@ -3,6 +3,7 @@ package com.example.kp_pi;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -73,6 +74,11 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         checkoutButton.setOnClickListener(v -> showOrderDialog());
         addServiceButton.setOnClickListener(v -> showAddServiceDialog());
         viewCartButton.setOnClickListener(v -> showCartDialog());
+
+        Button viewOrdersButton = findViewById(R.id.view_orders_button);
+        viewOrdersButton.setOnClickListener(v -> {
+            startActivity(new Intent(CatalogActivity.this, OrdersActivity.class));
+        });
     }
 
     private void loadServices() {
@@ -176,6 +182,16 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         orderDateTextView = dialogView.findViewById(R.id.order_date);
         Button datePickerButton = dialogView.findViewById(R.id.date_picker_button);
 
+        // Текст для отображения общей суммы
+        TextView orderTotalTextView = dialogView.findViewById(R.id.order_total);
+
+        // Расчет и отображение общей суммы
+        double total = 0;
+        for (Service service : cartItems) {
+            total += service.getPrice();
+        }
+        orderTotalTextView.setText(String.format("Итого: %.2f руб.", total));
+
         // Установка текущей даты
         selectedDate = Calendar.getInstance();
         updateDateTextView();
@@ -249,26 +265,34 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         order.setDate(sdf.format(selectedDate.getTime()));
+        order.setOrderDate(sdf.format(new Date())); // дата создания заявки
 
         order.setStatus("Новый");
 
         // Расчет общей суммы
         double total = 0;
         for (Service service : cartItems) {
-            OrderItem item = new OrderItem();
-            item.setServiceId(service.getId());
-            item.setServiceName(service.getName());
-            item.setServicePrice(service.getPrice());
-            item.setQuantity(1);
-            order.getItems().add(item);
             total += service.getPrice();
         }
         order.setTotalAmount(total);
 
         // Сохранение в БД
-        long orderId = dbHelper.createOrder(order.getCustomerName(), order.getCustomerPhone(), order.getCarModel(), order.getCarNumber(), order.getOrderDate(), order.getAppointmentDate(), order.getTotalAmount());
+        long orderId = dbHelper.createOrder(
+                order.getCustomerName(),
+                order.getCustomerPhone(),
+                order.getCarModel(),
+                order.getCarNumber(),
+                order.getOrderDate(),  // дата создания
+                order.getDate(),       // дата выполнения (appointment)
+                order.getTotalAmount()
+        );
 
         if (orderId != -1) {
+            // Сохранение элементов заказа
+            for (Service service : cartItems) {
+                dbHelper.addOrderItem(orderId, service.getId(), 1, service.getPrice());
+            }
+
             Toast.makeText(this, "Заявка №" + orderId + " оформлена!", Toast.LENGTH_LONG).show();
             cartItems.clear();
             updateCartCount();

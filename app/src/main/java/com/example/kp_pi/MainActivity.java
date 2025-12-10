@@ -34,9 +34,14 @@ public class MainActivity extends AppCompatActivity {
             String u = etUser.getText().toString();
             String p = etPass.getText().toString();
 
-
             if (db.checkLogin(u, p)) {
                 Toast.makeText(this, "Успешный вход", Toast.LENGTH_SHORT).show();
+
+                // Проверка, является ли пользователь администратором
+                if (db.isAdmin(u)) {
+                    Toast.makeText(this, "Вы вошли как администратор", Toast.LENGTH_SHORT).show();
+                }
+
                 startActivity(new Intent(MainActivity.this, CatalogActivity.class));
                 finish();
             } else {
@@ -49,4 +54,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, RegisterActivity.class));
         });
     }
+
+
 }

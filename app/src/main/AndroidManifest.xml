@@ -12,6 +12,9 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.KP_PI">
         <activity
+                android:name=".OrdersActivity"
+                android:exported="false"/>
+        <activity
                 android:name=".CatalogActivity"
                 android:exported="false"/>
         <activity
