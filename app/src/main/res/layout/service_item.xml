@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:background="?android:attr/selectableItemBackground"
+              android:clickable="true"
+              android:focusable="true"
+              android:layout_marginBottom="8dp"
+              android:backgroundTint="@android:color/white"
+              android:elevation="2dp">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+        <TextView
+                android:id="@+id/service_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Название услуги"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+        <TextView
+                android:id="@+id/service_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/light_blue"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Категория"
+                android:textSize="12sp"
+                android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/service_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Описание услуги"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+        <TextView
+                android:id="@+id/service_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Цена: 0 руб."
+                android:textSize="16sp"
+                android:textColor="@color/green_700"
+                android:textStyle="bold" />
+
+        <TextView
+                android:id="@+id/service_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Длительность: 0 мин."
+                android:textSize="14sp"
+                android:textColor="@color/gray_600" />
+
+    </LinearLayout>
+
+    <Button
+            android:id="@+id/add_to_cart_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Добавить в корзину"
+            android:backgroundTint="@color/blue_500"
+            android:textColor="@android:color/white" />
+
+</LinearLayout>

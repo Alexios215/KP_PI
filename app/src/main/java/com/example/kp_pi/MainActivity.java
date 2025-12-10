@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (db.checkLogin(u, p)) {
                 Toast.makeText(this, "Успешный вход", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                startActivity(new Intent(MainActivity.this, CatalogActivity.class));
                 finish();
             } else {
                 Toast.makeText(this, "Неверные данные", Toast.LENGTH_SHORT).show();

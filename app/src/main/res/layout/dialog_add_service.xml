@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Название услуги:"
+                android:layout_marginBottom="4dp" />
+
+        <EditText
+                android:id="@+id/service_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Введите название"
+                android:inputType="text"
+                android:layout_marginBottom="16dp" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Описание:"
+                android:layout_marginBottom="4dp" />
+
+        <EditText
+                android:id="@+id/service_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Введите описание"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:layout_marginBottom="16dp" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Цена (руб.):"
+                android:layout_marginBottom="4dp" />
+
+        <EditText
+                android:id="@+id/service_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Введите цену"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="16dp" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Длительность (мин.):"
+                android:layout_marginBottom="4dp" />
+
+        <EditText
+                android:id="@+id/service_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Введите длительность"
+                android:inputType="number"
+                android:layout_marginBottom="16dp" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Категория:"
+                android:layout_marginBottom="4dp" />
+
+        <EditText
+                android:id="@+id/service_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Введите категорию"
+                android:inputType="text"
+                android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+
+</ScrollView>
