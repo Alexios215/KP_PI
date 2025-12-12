@@ -1,6 +1,7 @@
 package com.example.kp_pi;
 
 
+import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -13,6 +14,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText etUser, etPass;
     Button btnReg;
+    Button btnBack;
     DBHelper db;
 
 
@@ -21,12 +23,18 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        getSupportActionBar().hide();
+
 
         etUser = findViewById(R.id.regUser);
         etPass = findViewById(R.id.regPass);
         btnReg = findViewById(R.id.btnRegister);
+        btnBack = findViewById(R.id.btnBack);
         db = new DBHelper(this);
 
+        btnBack.setOnClickListener(v -> {
+            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+        });
 
         btnReg.setOnClickListener(v -> {
             String u = etUser.getText().toString();

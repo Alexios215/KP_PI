@@ -47,6 +47,8 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
+        getSupportActionBar().hide();
+
         // Инициализация
         dbHelper = new DBHelper(this);
         cartItems = new ArrayList<>();
@@ -75,8 +77,9 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         addServiceButton.setOnClickListener(v -> showAddServiceDialog());
         viewCartButton.setOnClickListener(v -> showCartDialog());
 
-        Button viewOrdersButton = findViewById(R.id.view_orders_button);
-        viewOrdersButton.setOnClickListener(v -> {
+        Button fabOrders = findViewById(R.id.fab_orders);
+        fabOrders.setOnClickListener(v -> {
+            // Здесь будет переход к списку заказов
             startActivity(new Intent(CatalogActivity.this, OrdersActivity.class));
         });
     }
@@ -159,7 +162,7 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
             updateCartCount();
             Toast.makeText(CatalogActivity.this, "Корзина очищена", Toast.LENGTH_SHORT).show();
         });
-        builder.setNeutralButton("Продолжить покупки", null);
+        builder.setNeutralButton("Вернуться", null);
 
         builder.show();
     }
@@ -182,14 +185,29 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         orderDateTextView = dialogView.findViewById(R.id.order_date);
         Button datePickerButton = dialogView.findViewById(R.id.date_picker_button);
 
+        TextView orderSummary = dialogView.findViewById(R.id.order_summary);
+        TextView orderDetails = dialogView.findViewById(R.id.order_details);
+        TextView orderTotal = dialogView.findViewById(R.id.order_total);
+
+        // Расчет суммы
+        double total = 0;
+        StringBuilder details = new StringBuilder();
+        for (Service service : cartItems) {
+            total += service.getPrice();
+            details.append("• ").append(service.getName())
+                    .append(" - ").append(service.getPrice()).append(" руб.\n");
+        }
+
+        // Установка значений
+        orderSummary.setText(String.format("Итого: %.2f руб.", total));
+        orderTotal.setText(String.format("%.2f руб.", total));
+        orderDetails.setText(details.toString().isEmpty() ?
+                "Услуги не выбраны" : details.toString());
+
         // Текст для отображения общей суммы
         TextView orderTotalTextView = dialogView.findViewById(R.id.order_total);
 
-        // Расчет и отображение общей суммы
-        double total = 0;
-        for (Service service : cartItems) {
-            total += service.getPrice();
-        }
+        // Отображение общей суммы
         orderTotalTextView.setText(String.format("Итого: %.2f руб.", total));
 
         // Установка текущей даты

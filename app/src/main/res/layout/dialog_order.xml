@@ -1,116 +1,265 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:background="#F8F9FA"
+            android:padding="24dp">
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <!-- Имя клиента -->
-        <TextView
+        <!-- Заголовок -->
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Имя клиента:"
-                android:layout_marginBottom="4dp" />
+                android:orientation="vertical"
+                android:background="#2196F3"
+                android:padding="24dp"
+                android:layout_marginBottom="24dp">
 
-        <EditText
-                android:id="@+id/customer_name"
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Оформление заявки"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:gravity="center" />
+
+            <TextView
+                    android:id="@+id/order_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Итого: 0 руб."
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp" />
+
+        </LinearLayout>
+
+        <!-- Поля формы -->
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Введите имя"
-                android:inputType="textPersonName"
-                android:layout_marginBottom="16dp" />
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="20dp"
+                android:layout_marginBottom="20dp"
+                android:elevation="2dp">
 
-        <!-- Телефон -->
-        <TextView
+            <!-- Имя -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Имя клиента"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="8dp" />
+
+            <EditText
+                    android:id="@+id/customer_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Введите имя"
+                    android:textSize="16sp"
+                    android:background="@drawable/edittext_border"
+                    android:padding="14dp"
+                    android:layout_marginBottom="20dp" />
+
+            <!-- Телефон -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Телефон"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="8dp" />
+
+            <EditText
+                    android:id="@+id/customer_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Введите телефон"
+                    android:inputType="phone"
+                    android:textSize="16sp"
+                    android:background="@drawable/edittext_border"
+                    android:padding="14dp"
+                    android:layout_marginBottom="20dp" />
+
+            <!-- Авто -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="10dp"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Модель авто"
+                            android:textSize="14sp"
+                            android:textColor="#757575"
+                            android:layout_marginBottom="8dp" />
+
+                    <EditText
+                            android:id="@+id/car_model"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Модель"
+                            android:textSize="16sp"
+                            android:background="@drawable/edittext_border"
+                            android:padding="14dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Номер авто"
+                            android:textSize="14sp"
+                            android:textColor="#757575"
+                            android:layout_marginBottom="8dp" />
+
+                    <EditText
+                            android:id="@+id/car_number"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Номер"
+                            android:textSize="16sp"
+                            android:background="@drawable/edittext_border"
+                            android:padding="14dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Дата -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Дата выполнения"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/edittext_border"
+                    android:padding="14dp"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center_vertical">
+
+                <TextView
+                        android:id="@+id/order_date"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Выберите дату"
+                        android:textSize="16sp"
+                        android:textColor="#212121" />
+
+                <Button
+                        android:id="@+id/date_picker_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Выбрать"
+                        android:textColor="#2196F3"
+                        android:background="@android:color/transparent" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Детали заказа -->
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Телефон:"
-                android:layout_marginBottom="4dp" />
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="20dp"
+                android:elevation="2dp">
 
-        <EditText
-                android:id="@+id/customer_phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Введите телефон"
-                android:inputType="phone"
-                android:layout_marginBottom="16dp" />
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Детали заказа"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:layout_marginBottom="16px" />
 
-        <!-- Модель авто -->
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Модель авто:"
-                android:layout_marginBottom="4dp" />
+            <TextView
+                    android:id="@+id/order_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Услуги не выбраны"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
+                    android:lineSpacingExtra="6dp"
+                    android:layout_marginBottom="20dp" />
 
-        <EditText
-                android:id="@+id/car_model"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Введите модель"
-                android:inputType="text"
-                android:layout_marginBottom="16dp" />
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0"
+                    android:layout_marginBottom="20dp" />
 
-        <!-- Номер авто -->
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Номер авто:"
-                android:layout_marginBottom="4dp" />
+            <!-- Итог -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-        <EditText
-                android:id="@+id/car_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Введите номер"
-                android:inputType="text"
-                android:layout_marginBottom="16dp" />
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Общая стоимость:"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121" />
 
-        <!-- Дата заявки -->
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Дата выполнения:"
-                android:layout_marginBottom="4dp" />
+                <TextView
+                        android:id="@+id/order_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 руб."
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32" />
 
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Кнопки -->
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-            <TextView
-                    android:id="@+id/order_date"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:background="@android:color/darker_gray"
-                    android:text="Выберите дату"
-                    android:gravity="center" />
-
-            <Button
-                    android:id="@+id/date_picker_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Выбрать" />
+                android:layout_marginTop="24dp">
 
         </LinearLayout>
-
-        <!-- Итого -->
-        <TextView
-                android:id="@+id/order_total"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Итого: 0 руб."
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
 
     </LinearLayout>
 

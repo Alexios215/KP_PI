@@ -17,6 +17,19 @@
     <ListView
             android:id="@+id/orders_list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="661dp"/>
+    <Button
+            android:id="@+id/backCatalog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="20dp"
+            android:text="Вернуться"
+            android:textColor="@android:color/white"
+            android:background="#FF9800"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="14dp"
+            android:elevation="8dp"/>
 
 </LinearLayout>

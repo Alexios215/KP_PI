@@ -4,34 +4,106 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               android:gravity="center"
-              android:padding="24dp">
+              android:padding="24dp"
+              android:background="#F8F9FA">
 
+    <!-- Логотип -->
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🚗"
+            android:textSize="60sp"
+            android:layout_marginBottom="20dp" />
 
-<EditText
-        android:id="@+id/loginUser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Логин" />
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Автосервис"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3"
+            android:gravity="center"
+            android:layout_marginBottom="40dp" />
 
+    <!-- Форма входа -->
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="24dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="24dp">
 
-<EditText
-        android:id="@+id/loginPass"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Пароль"
-        android:inputType="textPassword" />
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Вход в систему"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
 
+        <!-- Логин -->
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Логин"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8dp" />
 
-<Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Войти" />
+        <EditText
+                android:id="@+id/loginUser"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Введите логин"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:textSize="16sp"
+                android:layout_marginBottom="20dp" />
 
+        <!-- Пароль -->
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Пароль"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8dp" />
 
-<Button
-        android:id="@+id/btnToRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Регистрация" />
+        <EditText
+                android:id="@+id/loginPass"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Введите пароль"
+                android:inputType="textPassword"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp" />
+
+        <!-- Кнопка входа -->
+        <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Войти"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:background="#2196F3" />
+
+    </LinearLayout>
+
+    <!-- Регистрация -->
+    <Button
+            android:id="@+id/btnToRegister"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Создать аккаунт"
+            android:textSize="16sp"
+            android:textColor="#2196F3"
+            android:background="@android:color/transparent" />
+
 </LinearLayout>

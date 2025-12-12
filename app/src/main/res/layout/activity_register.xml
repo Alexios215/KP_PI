@@ -3,28 +3,145 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:gravity="center"
+              android:background="#F8F9FA"
               android:padding="24dp">
 
-
-    <EditText
-            android:id="@+id/regUser"
+    <!-- Заголовок -->
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Логин" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="40dp">
 
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚗"
+                android:textSize="60sp"
+                android:layout_marginBottom="12dp" />
 
-    <EditText
-            android:id="@+id/regPass"
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Регистрация"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#2196F3"
+                android:gravity="center" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Создайте новый аккаунт"
+                android:textSize="16sp"
+                android:textColor="#757575"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Форма регистрации -->
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Пароль"
-            android:inputType="textPassword" />
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="28dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="24dp">
+
+        <!-- Логин -->
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Логин"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8px" />
+
+        <EditText
+                android:id="@+id/regUser"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Придумайте логин"
+                android:background="@drawable/edittext_border"
+                android:padding="14dp"
+                android:textSize="16sp"
+                android:layout_marginBottom="20dp" />
+
+        <!-- Пароль -->
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Пароль"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8px" />
+
+        <EditText
+                android:id="@+id/regPass"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Придумайте пароль"
+                android:inputType="textPassword"
+                android:background="@drawable/edittext_border"
+                android:padding="14dp"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp" />
+
+        <!-- Подтверждение пароля -->
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Подтвердите пароль"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8px" />
+
+        <EditText
+                android:id="@+id/regConfirmPass"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Повторите пароль"
+                android:inputType="textPassword"
+                android:background="@drawable/edittext_border"
+                android:padding="14dp"
+                android:textSize="16sp"
+                android:layout_marginBottom="28dp" />
+
+        <!-- Кнопка регистрации -->
+        <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Создать аккаунт"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:background="#2196F3"
+                android:layout_marginBottom="24dp" />
 
 
+    </LinearLayout>
+
+    <!-- Кнопка возврата -->
     <Button
-            android:id="@+id/btnRegister"
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Назад ко входу"
+            android:textSize="16sp"
+            android:textColor="#2196F3"
+            android:background="@android:color/transparent" />
+
+    <!-- Информация -->
+    <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Создать аккаунт" />
+            android:text="Уже есть аккаунт? Войдите в систему"
+            android:textSize="14sp"
+            android:textColor="#9E9E9E"
+            android:gravity="center"
+            android:layout_marginTop="20dp" />
+
 </LinearLayout>

@@ -1,7 +1,9 @@
 package com.example.kp_pi;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,11 +13,14 @@ public class OrdersActivity extends AppCompatActivity {
 
     private DBHelper dbHelper;
     private ListView ordersListView;
+    private Button backCatalog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
+
+        getSupportActionBar().hide();
 
         dbHelper = new DBHelper(this);
         ordersListView = findViewById(R.id.orders_list_view);
@@ -25,6 +30,10 @@ public class OrdersActivity extends AppCompatActivity {
 
     private void loadOrders() {
         List<Order> orders = dbHelper.getAllOrders();
+        backCatalog = findViewById(R.id.backCatalog);
+        backCatalog.setOnClickListener(v -> {
+            startActivity(new Intent(OrdersActivity.this, CatalogActivity.class));
+        });
 
         if (orders.isEmpty()) {
             Toast.makeText(this, "Нет заказов", Toast.LENGTH_SHORT).show();
