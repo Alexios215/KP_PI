@@ -3,6 +3,7 @@ package com.example.kp_pi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -33,19 +34,15 @@ public class MainActivity extends AppCompatActivity {
             if (db.checkLogin(u, p)) {
                 Toast.makeText(this, "Успешный вход", Toast.LENGTH_SHORT).show();
 
-                // Получаем тип пользователя
                 String userType = db.getUserType(u);
                 boolean isAdmin = "admin".equals(userType);
 
-                // Передаем информацию о пользователе в CatalogActivity
+                Log.d("MainActivity", "Вход: username=" + u + ", isAdmin=" + isAdmin);
+
                 Intent intent = new Intent(MainActivity.this, CatalogActivity.class);
                 intent.putExtra("username", u);
                 intent.putExtra("isAdmin", isAdmin);
                 intent.putExtra("userType", userType);
-
-                if (isAdmin) {
-                    Toast.makeText(this, "Вы вошли как администратор", Toast.LENGTH_SHORT).show();
-                }
 
                 startActivity(intent);
                 finish();

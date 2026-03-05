@@ -5,31 +5,30 @@
               android:orientation="vertical"
               android:padding="16dp">
 
+    <!-- Заголовок -->
     <TextView
+            android:id="@+id/orders_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Список заказов"
+            android:text="Загрузка..."
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
             android:layout_marginBottom="16dp" />
 
+    <!-- Список заказов -->
     <ListView
             android:id="@+id/orders_list_view"
             android:layout_width="match_parent"
-            android:layout_height="661dp"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="16dp" />
+
+    <!-- Кнопка возврата -->
     <Button
             android:id="@+id/backCatalog"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="20dp"
-            android:text="Вернуться"
-            android:textColor="@android:color/white"
-            android:background="#FF9800"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="14dp"
-            android:elevation="8dp"/>
+            android:text="Вернуться в каталог" />
 
 </LinearLayout>

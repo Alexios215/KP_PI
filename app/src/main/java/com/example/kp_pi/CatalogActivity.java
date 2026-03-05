@@ -2,10 +2,11 @@ package com.example.kp_pi;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +34,7 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
     private Button checkoutButton;
     private Button addServiceButton;
     private Button viewCartButton;
+    private Button fabOrders;
 
     private AlertDialog orderDialog;
     private EditText customerNameEditText;
@@ -45,7 +47,6 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
     private String currentUsername;
     private boolean isAdmin;
 
-    // Диалог для редактирования услуги
     private AlertDialog editServiceDialog;
     private EditText editNameEditText;
     private EditText editDescriptionEditText;
@@ -54,6 +55,8 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
     private EditText editCategoryEditText;
     private Service currentEditingService;
 
+    private static final String PREF_NAME = "cart_prefs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,53 +64,159 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
 
         getSupportActionBar().hide();
 
+        // Получаем данные о пользователе
         Intent intent = getIntent();
         currentUsername = intent.getStringExtra("username");
         isAdmin = intent.getBooleanExtra("isAdmin", false);
 
+        // Отладка
+        Log.d("CatalogActivity", "currentUsername = " + currentUsername);
+        Log.d("CatalogActivity", "isAdmin = " + isAdmin);
+
+        // Инициализация
         dbHelper = new DBHelper(this);
         cartItems = new ArrayList<>();
         serviceList = new ArrayList<>();
 
+        // Находим элементы интерфейса
         recyclerView = findViewById(R.id.recycler_view);
         cartCountText = findViewById(R.id.cart_count_text);
         checkoutButton = findViewById(R.id.checkout_button);
         addServiceButton = findViewById(R.id.add_service_button);
         viewCartButton = findViewById(R.id.view_cart_button);
+        fabOrders = findViewById(R.id.fab_orders);
 
+        // Устанавливаем текст на кнопке заказов в зависимости от типа пользователя
+        if (isAdmin) {
+            fabOrders.setText("Все заказы");
+        } else {
+            fabOrders.setText("Мои заказы");
+        }
+
+        // Скрываем кнопку добавления услуги для обычных клиентов
         if (!isAdmin) {
             addServiceButton.setVisibility(View.GONE);
         }
 
+        // Настройка RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ServiceAdapter(serviceList, this, this, isAdmin);
         recyclerView.setAdapter(adapter);
 
+        // Загрузка услуг
         loadServices();
+
+        // Загрузка корзины для текущего пользователя
+        loadCartFromPrefs();
+
+        // Обновление счетчика корзины
         updateCartCount();
 
+        // Обработчики кликов
         checkoutButton.setOnClickListener(v -> showOrderDialog());
         addServiceButton.setOnClickListener(v -> showAddServiceDialog());
         viewCartButton.setOnClickListener(v -> showCartDialog());
 
-        Button fabOrders = findViewById(R.id.fab_orders);
         fabOrders.setOnClickListener(v -> {
+            // Сохраняем корзину перед переходом
+            saveCartToPrefs();
+
+            // Переход к истории заказов
             Intent ordersIntent = new Intent(CatalogActivity.this, OrdersActivity.class);
             ordersIntent.putExtra("username", currentUsername);
             ordersIntent.putExtra("isAdmin", isAdmin);
+
+            // Отладка
+            Log.d("CatalogActivity", "Передаем в OrdersActivity: username=" + currentUsername + ", isAdmin=" + isAdmin);
+
             startActivity(ordersIntent);
         });
     }
 
+    // Загрузка списка услуг из БД
+
     private void loadServices() {
         serviceList.clear();
-        serviceList.addAll(dbHelper.getAllServices());
+        if (isAdmin) {
+            // Админ видит все услуги (и активные, и неактивные)
+            serviceList.addAll(dbHelper.getAllServices());
+        } else {
+            // Клиент видит только активные услуги
+            serviceList.addAll(dbHelper.getActiveServices());
+        }
         adapter.notifyDataSetChanged();
     }
+
+    // Обновление счетчика корзины
 
     private void updateCartCount() {
         cartCountText.setText(String.format("В корзине: %d", cartItems.size()));
     }
+
+    // Сохранение корзины в SharedPreferences с привязкой к пользователю
+
+    private void saveCartToPrefs() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // Создаем уникальный ключ для каждого пользователя
+        String userCartKey = "cart_items_" + currentUsername;
+
+        StringBuilder ids = new StringBuilder();
+        for (int i = 0; i < cartItems.size(); i++) {
+            if (i > 0) ids.append(",");
+            ids.append(cartItems.get(i).getId());
+        }
+        editor.putString(userCartKey, ids.toString());
+        editor.apply();
+    }
+
+    // Загрузка корзины из SharedPreferences для конкретного пользователя
+
+    private void loadCartFromPrefs() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
+        // Загружаем корзину только для текущего пользователя
+        String userCartKey = "cart_items_" + currentUsername;
+        String idsStr = prefs.getString(userCartKey, "");
+
+        cartItems.clear();
+        if (!idsStr.isEmpty()) {
+            String[] idArray = idsStr.split(",");
+            for (String idStr : idArray) {
+                try {
+                    int serviceId = Integer.parseInt(idStr);
+                    // Ищем услугу в загруженном списке
+                    for (Service service : serviceList) {
+                        if (service.getId() == serviceId) {
+                            cartItems.add(service);
+                            break;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        updateCartCount();
+    }
+
+    // Очистка корзины пользователя
+
+    private void clearUserCart() {
+        cartItems.clear();
+        updateCartCount();
+
+        // Очищаем сохраненную корзину в SharedPreferences
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        String userCartKey = "cart_items_" + currentUsername;
+        editor.remove(userCartKey);
+        editor.apply();
+    }
+
+    // Обработчики кликов из адаптера
 
     @Override
     public void onItemClick(Service service) {
@@ -118,12 +227,12 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
     public void onAddToCartClick(Service service) {
         cartItems.add(service);
         updateCartCount();
+        saveCartToPrefs();
         Toast.makeText(this, "Услуга добавлена в корзину", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEditClick(Service service) {
-        // Только для администратора
         if (!isAdmin) {
             Toast.makeText(this, "Только администратор может редактировать услуги", Toast.LENGTH_SHORT).show();
             return;
@@ -133,30 +242,58 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
 
     @Override
     public void onDeleteClick(Service service) {
-        // Только для администратора
         if (!isAdmin) {
-            Toast.makeText(this, "Только администратор может удалять услуги", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Только администратор может деактивировать услуги", Toast.LENGTH_SHORT).show();
             return;
         }
-        showDeleteConfirmationDialog(service);
+
+        if (service.isActive()) {
+            showDeactivateConfirmationDialog(service);
+        }
     }
 
-    private void showDeleteConfirmationDialog(Service service) {
+    @Override
+    public void onActivateClick(Service service) {
+        if (!isAdmin) {
+            Toast.makeText(this, "Только администратор может активировать услуги", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!service.isActive()) {
+            showActivateConfirmationDialog(service);
+        }
+    }
+
+    // Диалоги
+
+    private void showServiceDetailsDialog(Service service) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Удаление услуги");
-        builder.setMessage("Вы уверены, что хотите удалить услугу \"" + service.getName() + "\"?");
+        builder.setTitle(service.getName());
 
-        builder.setPositiveButton("Удалить", (dialog, which) -> {
-            boolean deleted = dbHelper.deleteService(service.getId());
-            if (deleted) {
-                Toast.makeText(this, "Услуга удалена", Toast.LENGTH_SHORT).show();
-                loadServices(); // Обновляем список
-            } else {
-                Toast.makeText(this, "Нельзя удалить услугу, которая есть в заказах", Toast.LENGTH_LONG).show();
-            }
-        });
+        String message = String.format(Locale.getDefault(),
+                "Описание: %s\n\n" +
+                        "Цена: %.2f руб.\n" +
+                        "Длительность: %d мин.\n" +
+                        "Категория: %s\n" +
+                        "Статус: %s",
+                service.getDescription(),
+                service.getPrice(),
+                service.getDuration(),
+                service.getCategory(),
+                service.isActive() ? "Активна" : "Неактивна");
 
-        builder.setNegativeButton("Отмена", null);
+        builder.setMessage(message);
+
+        if (service.isActive()) {
+            builder.setPositiveButton("Добавить в корзину", (dialog, which) -> {
+                cartItems.add(service);
+                updateCartCount();
+                saveCartToPrefs();
+                Toast.makeText(CatalogActivity.this, "Услуга добавлена в корзину", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        builder.setNegativeButton("Закрыть", null);
         builder.show();
     }
 
@@ -173,7 +310,6 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         editDurationEditText = dialogView.findViewById(R.id.service_duration);
         editCategoryEditText = dialogView.findViewById(R.id.service_category);
 
-        // Заполняем существующие данные
         editNameEditText.setText(service.getName());
         editDescriptionEditText.setText(service.getDescription());
         editPriceEditText.setText(String.valueOf(service.getPrice()));
@@ -187,7 +323,6 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         editServiceDialog = builder.create();
         editServiceDialog.show();
 
-        // Обработчик сохранения
         editServiceDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             if (validateEditForm()) {
                 updateService();
@@ -235,33 +370,109 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         boolean updated = dbHelper.updateService(currentEditingService);
         if (updated) {
             Toast.makeText(this, "Услуга обновлена", Toast.LENGTH_SHORT).show();
-            loadServices(); // Обновляем список
+            loadServices();
         } else {
             Toast.makeText(this, "Ошибка при обновлении", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showServiceDetailsDialog(Service service) {
+    private void showDeactivateConfirmationDialog(Service service) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(service.getName());
+        builder.setTitle("Деактивация услуги");
+        builder.setMessage("Вы уверены, что хотите деактивировать услугу \"" + service.getName() + "\"?\n\n" +
+                "Она не будет отображаться для клиентов, но останется в истории заказов.");
 
-        String message = String.format(Locale.getDefault(),
-                "Описание: %s\n\n" +
-                        "Цена: %.2f руб.\n" +
-                        "Длительность: %d мин.\n" +
-                        "Категория: %s",
-                service.getDescription(),
-                service.getPrice(),
-                service.getDuration(),
-                service.getCategory());
+        builder.setPositiveButton("Деактивировать", (dialog, which) -> {
+            boolean deactivated = dbHelper.deactivateService(service.getId());
+            if (deactivated) {
+                Toast.makeText(this, "Услуга деактивирована", Toast.LENGTH_SHORT).show();
+                loadServices();
 
-        builder.setMessage(message);
-        builder.setPositiveButton("Добавить в корзину", (dialog, which) -> {
-            cartItems.add(service);
-            updateCartCount();
-            Toast.makeText(CatalogActivity.this, "Услуга добавлена в корзину", Toast.LENGTH_SHORT).show();
+                boolean removed = false;
+                for (int i = cartItems.size() - 1; i >= 0; i--) {
+                    if (cartItems.get(i).getId() == service.getId()) {
+                        cartItems.remove(i);
+                        removed = true;
+                    }
+                }
+                if (removed) {
+                    updateCartCount();
+                    saveCartToPrefs();
+                }
+            } else {
+                Toast.makeText(this, "Ошибка при деактивации", Toast.LENGTH_SHORT).show();
+            }
         });
-        builder.setNegativeButton("Закрыть", null);
+
+        builder.setNegativeButton("Отмена", null);
+        builder.show();
+    }
+
+    private void showActivateConfirmationDialog(Service service) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Активация услуги");
+        builder.setMessage("Вы уверены, что хотите активировать услугу \"" + service.getName() + "\"?\n\n" +
+                "Она снова будет отображаться для клиентов.");
+
+        builder.setPositiveButton("Активировать", (dialog, which) -> {
+            boolean activated = dbHelper.activateService(service.getId());
+            if (activated) {
+                Toast.makeText(this, "Услуга активирована", Toast.LENGTH_SHORT).show();
+                loadServices();
+            } else {
+                Toast.makeText(this, "Ошибка при активации", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", null);
+        builder.show();
+    }
+
+    private void showAddServiceDialog() {
+        if (!isAdmin) {
+            Toast.makeText(this, "Только администратор может добавлять услуги", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_service, null);
+        builder.setView(dialogView);
+
+        final EditText nameEditText = dialogView.findViewById(R.id.service_name);
+        final EditText descriptionEditText = dialogView.findViewById(R.id.service_description);
+        final EditText priceEditText = dialogView.findViewById(R.id.service_price);
+        final EditText durationEditText = dialogView.findViewById(R.id.service_duration);
+        final EditText categoryEditText = dialogView.findViewById(R.id.service_category);
+
+        builder.setTitle("Добавление новой услуги");
+        builder.setPositiveButton("Добавить", (dialog, which) -> {
+            String name = nameEditText.getText().toString();
+            String description = descriptionEditText.getText().toString();
+            String priceStr = priceEditText.getText().toString();
+            String durationStr = durationEditText.getText().toString();
+            String category = categoryEditText.getText().toString();
+
+            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(priceStr) || TextUtils.isEmpty(durationStr)) {
+                Toast.makeText(CatalogActivity.this, "Заполните обязательные поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                double price = Double.parseDouble(priceStr);
+                int duration = Integer.parseInt(durationStr);
+
+                long id = dbHelper.addService(name, description, price, duration, category);
+
+                if (id != -1) {
+                    Toast.makeText(CatalogActivity.this, "Услуга добавлена", Toast.LENGTH_SHORT).show();
+                    loadServices();
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(CatalogActivity.this, "Некорректные числовые значения", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", null);
         builder.show();
     }
 
@@ -292,8 +503,7 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
 
         builder.setPositiveButton("Оформить заказ", (dialog, which) -> showOrderDialog());
         builder.setNegativeButton("Очистить корзину", (dialog, which) -> {
-            cartItems.clear();
-            updateCartCount();
+            clearUserCart();
             Toast.makeText(CatalogActivity.this, "Корзина очищена", Toast.LENGTH_SHORT).show();
         });
         builder.setNeutralButton("Вернуться", null);
@@ -333,7 +543,6 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         }
 
         orderSummary.setText(String.format("Итого: %.2f руб.", total));
-        orderTotal.setText(String.format("%.2f руб.", total));
         orderDetails.setText(details.toString().isEmpty() ?
                 "Услуги не выбраны" : details.toString());
 
@@ -435,60 +644,24 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
             }
 
             Toast.makeText(this, "Заявка №" + orderId + " оформлена!", Toast.LENGTH_LONG).show();
-            cartItems.clear();
-            updateCartCount();
+            clearUserCart();
         } else {
             Toast.makeText(this, "Ошибка при сохранении заявки", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showAddServiceDialog() {
-        if (!isAdmin) {
-            Toast.makeText(this, "Только администратор может добавлять услуги", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveCartToPrefs();
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_service, null);
-        builder.setView(dialogView);
-
-        final EditText nameEditText = dialogView.findViewById(R.id.service_name);
-        final EditText descriptionEditText = dialogView.findViewById(R.id.service_description);
-        final EditText priceEditText = dialogView.findViewById(R.id.service_price);
-        final EditText durationEditText = dialogView.findViewById(R.id.service_duration);
-        final EditText categoryEditText = dialogView.findViewById(R.id.service_category);
-
-        builder.setTitle("Добавление новой услуги");
-        builder.setPositiveButton("Добавить", (dialog, which) -> {
-            String name = nameEditText.getText().toString();
-            String description = descriptionEditText.getText().toString();
-            String priceStr = priceEditText.getText().toString();
-            String durationStr = durationEditText.getText().toString();
-            String category = categoryEditText.getText().toString();
-
-            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(priceStr) || TextUtils.isEmpty(durationStr)) {
-                Toast.makeText(CatalogActivity.this, "Заполните обязательные поля", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            try {
-                double price = Double.parseDouble(priceStr);
-                int duration = Integer.parseInt(durationStr);
-
-                Service service = new Service(name, description, price, duration, category);
-                long id = dbHelper.addService(service.getName(), service.getDescription(), service.getPrice(), service.getDuration(), service.getCategory());
-
-                if (id != -1) {
-                    Toast.makeText(CatalogActivity.this, "Услуга добавлена", Toast.LENGTH_SHORT).show();
-                    loadServices();
-                }
-            } catch (NumberFormatException e) {
-                Toast.makeText(CatalogActivity.this, "Некорректные числовые значения", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Отмена", null);
-        builder.show();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadServices();
+        loadCartFromPrefs();
+        updateCartCount();
     }
 
     @Override

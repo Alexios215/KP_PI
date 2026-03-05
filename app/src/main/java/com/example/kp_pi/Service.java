@@ -7,18 +7,20 @@ public class Service {
     private double price;
     private int duration;
     private String category;
+    private boolean isActive; // Новое поле
 
-    // Конструкторы, геттеры и сеттеры
+    public Service() {}
+
     public Service(String name, String description, double price, int duration, String category) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.duration = duration;
         this.category = category;
+        this.isActive = true; // По умолчанию активна
     }
 
-    public Service() {}
-
+    // Геттеры и сеттеры
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -36,4 +38,7 @@ public class Service {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
 }

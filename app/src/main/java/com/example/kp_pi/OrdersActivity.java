@@ -2,18 +2,22 @@ package com.example.kp_pi;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 
 public class OrdersActivity extends AppCompatActivity {
 
+    private static final String TAG = "OrdersActivity";
     private DBHelper dbHelper;
     private ListView ordersListView;
     private Button backCatalog;
+    private TextView titleTextView;  // Добавляем TextView для заголовка
     private String currentUsername;
     private boolean isAdmin;
 
@@ -24,50 +28,92 @@ public class OrdersActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        // Получаем данные о пользователе
+        // Получаем данные из Intent
         Intent intent = getIntent();
-        currentUsername = intent.getStringExtra("username");
-        isAdmin = intent.getBooleanExtra("isAdmin", false);
 
+        // Отладка
+        Log.d(TAG, "=== OrdersActivity onCreate ===");
+
+        if (intent != null) {
+            currentUsername = intent.getStringExtra("username");
+            isAdmin = intent.getBooleanExtra("isAdmin", false);
+
+            Log.d(TAG, "Получен username: '" + currentUsername + "'");
+            Log.d(TAG, "Получен isAdmin: " + isAdmin);
+        }
+
+        // Инициализация
         dbHelper = new DBHelper(this);
         ordersListView = findViewById(R.id.orders_list_view);
         backCatalog = findViewById(R.id.backCatalog);
+        titleTextView = findViewById(R.id.orders_title); // Теперь этот ID существует в разметке
+
+        // Устанавливаем заголовок
+        if (titleTextView != null) {
+            if (isAdmin) {
+                titleTextView.setText("Все заказы");
+                Log.d(TAG, "Установлен заголовок: Все заказы");
+            } else {
+                titleTextView.setText("Мои заказы");
+                Log.d(TAG, "Установлен заголовок: Мои заказы");
+            }
+        } else {
+            Log.e(TAG, "titleTextView = null! Проверьте разметку activity_orders.xml");
+        }
 
         backCatalog.setOnClickListener(v -> {
+            Log.d(TAG, "Нажата кнопка возврата");
             Intent catalogIntent = new Intent(OrdersActivity.this, CatalogActivity.class);
             catalogIntent.putExtra("username", currentUsername);
             catalogIntent.putExtra("isAdmin", isAdmin);
             startActivity(catalogIntent);
+            finish();
         });
 
         loadOrders();
     }
 
     private void loadOrders() {
+        Log.d(TAG, "Загрузка заказов для пользователя: " + currentUsername + ", isAdmin: " + isAdmin);
+
         List<Order> orders;
 
-        // Если администратор - показываем все заказы
         if (isAdmin) {
+            Log.d(TAG, "Загружаем ВСЕ заказы");
             orders = dbHelper.getAllOrders();
         } else {
-            // Если клиент - показываем только его заказы
+            Log.d(TAG, "Загружаем заказы только для пользователя: " + currentUsername);
             orders = dbHelper.getOrdersByUsername(currentUsername);
         }
 
-        if (orders.isEmpty()) {
+        if (orders == null || orders.isEmpty()) {
+            Log.d(TAG, "Заказы не найдены");
             Toast.makeText(this, "Нет заказов", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        Log.d(TAG, "Найдено заказов: " + orders.size());
+
         String[] orderStrings = new String[orders.size()];
         for (int i = 0; i < orders.size(); i++) {
             Order order = orders.get(i);
-            orderStrings[i] = String.format("Заявка #%d\nКлиент: %s\nАвто: %s\nСумма: %.2f руб.\nСтатус: %s",
+
+            StringBuilder itemsStr = new StringBuilder();
+            if (order.getItems() != null) {
+                for (OrderItem item : order.getItems()) {
+                    itemsStr.append("\n    • ").append(item.getServiceName());
+                }
+            }
+
+            orderStrings[i] = String.format("Заявка #%d\nКлиент: %s\nАвто: %s\nСумма: %.2f руб.\nСтатус: %s\nУслуги:%s",
                     order.getId(),
                     order.getCustomerName(),
                     order.getCarModel(),
                     order.getTotalAmount(),
-                    order.getStatus());
+                    order.getStatus(),
+                    itemsStr.toString());
+
+            Log.d(TAG, "Заказ #" + order.getId() + " от клиента: " + order.getCustomerName());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
