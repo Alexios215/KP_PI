@@ -14,6 +14,8 @@ public class OrdersActivity extends AppCompatActivity {
     private DBHelper dbHelper;
     private ListView ordersListView;
     private Button backCatalog;
+    private String currentUsername;
+    private boolean isAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,18 +24,35 @@ public class OrdersActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
+        // Получаем данные о пользователе
+        Intent intent = getIntent();
+        currentUsername = intent.getStringExtra("username");
+        isAdmin = intent.getBooleanExtra("isAdmin", false);
+
         dbHelper = new DBHelper(this);
         ordersListView = findViewById(R.id.orders_list_view);
+        backCatalog = findViewById(R.id.backCatalog);
+
+        backCatalog.setOnClickListener(v -> {
+            Intent catalogIntent = new Intent(OrdersActivity.this, CatalogActivity.class);
+            catalogIntent.putExtra("username", currentUsername);
+            catalogIntent.putExtra("isAdmin", isAdmin);
+            startActivity(catalogIntent);
+        });
 
         loadOrders();
     }
 
     private void loadOrders() {
-        List<Order> orders = dbHelper.getAllOrders();
-        backCatalog = findViewById(R.id.backCatalog);
-        backCatalog.setOnClickListener(v -> {
-            startActivity(new Intent(OrdersActivity.this, CatalogActivity.class));
-        });
+        List<Order> orders;
+
+        // Если администратор - показываем все заказы
+        if (isAdmin) {
+            orders = dbHelper.getAllOrders();
+        } else {
+            // Если клиент - показываем только его заказы
+            orders = dbHelper.getOrdersByUsername(currentUsername);
+        }
 
         if (orders.isEmpty()) {
             Toast.makeText(this, "Нет заказов", Toast.LENGTH_SHORT).show();

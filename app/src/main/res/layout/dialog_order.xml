@@ -231,15 +231,6 @@
                     android:gravity="center_vertical">
 
                 <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Общая стоимость:"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#212121" />
-
-                <TextView
                         android:id="@+id/order_total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

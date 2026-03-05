@@ -2,7 +2,6 @@ package com.example.kp_pi;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -42,12 +41,21 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
     private TextView orderDateTextView;
     private Calendar selectedDate;
 
+    // Новые поля для хранения информации о пользователе
+    private String currentUsername;
+    private boolean isAdmin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
         getSupportActionBar().hide();
+
+        // Получаем данные о пользователе из Intent
+        Intent intent = getIntent();
+        currentUsername = intent.getStringExtra("username");
+        isAdmin = intent.getBooleanExtra("isAdmin", false);
 
         // Инициализация
         dbHelper = new DBHelper(this);
@@ -60,6 +68,11 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         checkoutButton = findViewById(R.id.checkout_button);
         addServiceButton = findViewById(R.id.add_service_button);
         viewCartButton = findViewById(R.id.view_cart_button);
+
+        // Скрываем кнопку добавления услуги для обычных клиентов
+        if (!isAdmin) {
+            addServiceButton.setVisibility(View.GONE);
+        }
 
         // Настройка RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -79,8 +92,11 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
 
         Button fabOrders = findViewById(R.id.fab_orders);
         fabOrders.setOnClickListener(v -> {
-            // Здесь будет переход к списку заказов
-            startActivity(new Intent(CatalogActivity.this, OrdersActivity.class));
+            // Передаем информацию о пользователе в OrdersActivity
+            Intent ordersIntent = new Intent(CatalogActivity.this, OrdersActivity.class);
+            ordersIntent.putExtra("username", currentUsername);
+            ordersIntent.putExtra("isAdmin", isAdmin);
+            startActivity(ordersIntent);
         });
     }
 
@@ -188,6 +204,9 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
         TextView orderSummary = dialogView.findViewById(R.id.order_summary);
         TextView orderDetails = dialogView.findViewById(R.id.order_details);
         TextView orderTotal = dialogView.findViewById(R.id.order_total);
+
+        // Предзаполняем имя клиента текущим пользователем
+        customerNameEditText.setText(currentUsername);
 
         // Расчет суммы
         double total = 0;
@@ -320,6 +339,12 @@ public class CatalogActivity extends AppCompatActivity implements ServiceAdapter
     }
 
     private void showAddServiceDialog() {
+        // Проверяем, что пользователь - администратор
+        if (!isAdmin) {
+            Toast.makeText(this, "Только администратор может добавлять услуги", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_service, null);
         builder.setView(dialogView);

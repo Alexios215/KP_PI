@@ -1,6 +1,5 @@
 package com.example.kp_pi;
 
-
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,15 +7,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
 public class RegisterActivity extends AppCompatActivity {
-
 
     EditText etUser, etPass;
     Button btnReg;
     Button btnBack;
     DBHelper db;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +20,6 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         getSupportActionBar().hide();
-
 
         etUser = findViewById(R.id.regUser);
         etPass = findViewById(R.id.regPass);
@@ -40,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
             String u = etUser.getText().toString();
             String p = etPass.getText().toString();
 
-
+            // При регистрации всегда создаем клиента (не админа)
             if (db.insertUser(u, p)) {
                 Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
                 finish();

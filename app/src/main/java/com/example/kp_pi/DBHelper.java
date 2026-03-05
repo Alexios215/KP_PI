@@ -10,15 +10,15 @@ import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
     // Версия базы данных увеличена для добавления новых таблиц
-    public static final int DATABASE_VERSION = 2; // Изменено с 1 на 2
-    public static final String DATABASE_NAME = "autoservice.db"; // Изменено имя базы
+    public static final int DATABASE_VERSION = 2;
+    public static final String DATABASE_NAME = "autoservice.db";
 
-    // Таблица пользователей (уже есть)
+    // Таблица пользователей
     public static final String TABLE_USERS = "users";
     public static final String COLUMN_USER_ID = "id";
     public static final String COLUMN_USERNAME = "username";
     public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_USER_TYPE = "user_type"; // Новая колонка
+    public static final String COLUMN_USER_TYPE = "user_type";
 
     // Новые таблицы для услуг
     public static final String TABLE_SERVICES = "services";
@@ -55,7 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Создаем таблицу пользователей (ваш существующий код)
+        // Создаем таблицу пользователей
         db.execSQL("CREATE TABLE " + TABLE_USERS + "(" +
                 COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_USERNAME + " TEXT UNIQUE, " +
@@ -100,10 +100,10 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) {
-            // Добавляем колонку типа пользователя
+            // Колонка типа пользователя
             db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_USER_TYPE + " TEXT DEFAULT 'client'");
 
-            // Создаем новые таблицы
+            // Создание новых таблиц
             db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_SERVICES + "(" +
                     COLUMN_SERVICE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_SERVICE_NAME + " TEXT NOT NULL, " +
@@ -157,8 +157,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
-
-    // Новые методы для работы с услугами
 
     public long addService(String name, String description, double price, int duration, String category) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -233,8 +231,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return categories;
     }
-
-    // Новые методы для работы с заказами
 
     public long createOrder(String customerName, String customerPhone, String carModel,
                             String carNumber, String orderDate, String appointmentDate,
@@ -335,8 +331,6 @@ public class DBHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    // Вспомогательные методы
-
     private void addTestData(SQLiteDatabase db) {
         // Добавляем тестового администратора
         ContentValues adminValues = new ContentValues();
@@ -368,8 +362,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Новые методы для проверки администратора
-
     public boolean isAdmin(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT " + COLUMN_USER_TYPE + " FROM " + TABLE_USERS +
@@ -384,4 +376,64 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return isAdmin;
     }
+
+    public String getUserType(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_USER_TYPE + " FROM " + TABLE_USERS +
+                " WHERE " + COLUMN_USERNAME + "=?", new String[]{username});
+
+        String userType = "client"; // по умолчанию клиент
+        if (cursor.moveToFirst()) {
+            userType = cursor.getString(0);
+        }
+        cursor.close();
+        db.close();
+        return userType;
+    }
+
+    // Метод для получения имени пользователя по ID
+    public String getUsernameById(long userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_USERNAME + " FROM " + TABLE_USERS +
+                " WHERE " + COLUMN_USER_ID + "=?", new String[]{String.valueOf(userId)});
+
+        String username = "";
+        if (cursor.moveToFirst()) {
+            username = cursor.getString(0);
+        }
+        cursor.close();
+        db.close();
+        return username;
+    }
+
+    // Метод для получения заказов только конкретного пользователя
+    public List<Order> getOrdersByUsername(String username) {
+        List<Order> orderList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDERS +
+                        " WHERE " + COLUMN_CUSTOMER_NAME + "=? ORDER BY " + COLUMN_ORDER_DATE + " DESC",
+                new String[]{username});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDER_ID)));
+                order.setCustomerName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CUSTOMER_NAME)));
+                order.setCustomerPhone(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CUSTOMER_PHONE)));
+                order.setCarModel(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CAR_MODEL)));
+                order.setCarNumber(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CAR_NUMBER)));
+                order.setOrderDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDER_DATE)));
+                order.setAppointmentDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_APPOINTMENT_DATE)));
+                order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS)));
+                order.setTotalAmount(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_TOTAL_AMOUNT)));
+
+                order.setItems(getOrderItems(order.getId()));
+                orderList.add(order);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return orderList;
+    }
 }
+
