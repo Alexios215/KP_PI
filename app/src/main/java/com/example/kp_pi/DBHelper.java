@@ -435,5 +435,69 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return orderList;
     }
+
+    public boolean updateService(Service service) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SERVICE_NAME, service.getName());
+        values.put(COLUMN_DESCRIPTION, service.getDescription());
+        values.put(COLUMN_PRICE, service.getPrice());
+        values.put(COLUMN_DURATION, service.getDuration());
+        values.put(COLUMN_CATEGORY, service.getCategory());
+
+        int rowsAffected = db.update(TABLE_SERVICES, values,
+                COLUMN_SERVICE_ID + " = ?",
+                new String[]{String.valueOf(service.getId())});
+        db.close();
+        return rowsAffected > 0;
+    }
+
+    public boolean deleteService(int serviceId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Сначала проверяем, есть ли заказы с этой услугой
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ORDER_ITEMS +
+                        " WHERE " + COLUMN_SERVICE_ID_FK + " = ?",
+                new String[]{String.valueOf(serviceId)});
+
+        boolean hasOrders = false;
+        if (cursor.moveToFirst()) {
+            hasOrders = cursor.getInt(0) > 0;
+        }
+        cursor.close();
+
+        if (hasOrders) {
+            db.close();
+            return false; // Нельзя удалить услугу, которая есть в заказах
+        }
+
+        // Если нет заказов, удаляем услугу
+        int rowsAffected = db.delete(TABLE_SERVICES,
+                COLUMN_SERVICE_ID + " = ?",
+                new String[]{String.valueOf(serviceId)});
+        db.close();
+        return rowsAffected > 0;
+    }
+
+    public Service getServiceById(int serviceId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_SERVICES +
+                        " WHERE " + COLUMN_SERVICE_ID + " = ?",
+                new String[]{String.valueOf(serviceId)});
+
+        Service service = null;
+        if (cursor.moveToFirst()) {
+            service = new Service();
+            service.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVICE_ID)));
+            service.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SERVICE_NAME)));
+            service.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION)));
+            service.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRICE)));
+            service.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DURATION)));
+            service.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY)));
+        }
+        cursor.close();
+        db.close();
+        return service;
+    }
 }
 

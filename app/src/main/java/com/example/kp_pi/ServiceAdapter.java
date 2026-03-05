@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
@@ -13,16 +14,20 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ViewHold
     private List<Service> serviceList;
     private Context context;
     private OnItemClickListener listener;
+    private boolean isAdmin; // Добавляем поле для проверки прав
 
     public interface OnItemClickListener {
         void onItemClick(Service service);
         void onAddToCartClick(Service service);
+        void onEditClick(Service service); // Новый метод для редактирования
+        void onDeleteClick(Service service); // Новый метод для удаления
     }
 
-    public ServiceAdapter(List<Service> serviceList, Context context, OnItemClickListener listener) {
+    public ServiceAdapter(List<Service> serviceList, Context context, OnItemClickListener listener, boolean isAdmin) {
         this.serviceList = serviceList;
         this.context = context;
         this.listener = listener;
+        this.isAdmin = isAdmin;
     }
 
     @Override
@@ -44,6 +49,18 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ViewHold
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(service));
         holder.addToCartButton.setOnClickListener(v -> listener.onAddToCartClick(service));
+
+        // Для администратора показываем кнопки редактирования и удаления
+        if (isAdmin) {
+            holder.editButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setVisibility(View.VISIBLE);
+
+            holder.editButton.setOnClickListener(v -> listener.onEditClick(service));
+            holder.deleteButton.setOnClickListener(v -> listener.onDeleteClick(service));
+        } else {
+            holder.editButton.setVisibility(View.GONE);
+            holder.deleteButton.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -58,6 +75,8 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ViewHold
         TextView serviceDuration;
         TextView serviceCategory;
         Button addToCartButton;
+        ImageButton editButton; // Кнопка редактирования
+        ImageButton deleteButton; // Кнопка удаления
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -67,6 +86,8 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ViewHold
             serviceDuration = itemView.findViewById(R.id.service_duration);
             serviceCategory = itemView.findViewById(R.id.service_category);
             addToCartButton = itemView.findViewById(R.id.add_to_cart_button);
+            editButton = itemView.findViewById(R.id.edit_button);
+            deleteButton = itemView.findViewById(R.id.delete_button);
         }
     }
 

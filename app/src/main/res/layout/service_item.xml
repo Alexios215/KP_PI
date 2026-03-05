@@ -3,121 +3,87 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:background="@android:color/white"
-              android:layout_marginHorizontal="0dp"
-              android:layout_marginBottom="12dp"
-              android:padding="20dp"
-              android:elevation="2dp">
+              android:padding="16dp"
+              android:background="?android:attr/selectableItemBackground">
 
-    <!-- Верхняя строка -->
-    <LinearLayout
+    <TextView
+            android:id="@+id/service_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12px">
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
 
-        <TextView
-                android:id="@+id/service_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Название услуги"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-        <TextView
-                android:id="@+id/service_category"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Категория"
-                android:textSize="12sp"
-                android:textColor="#2E7D32"
-                android:background="#E8F5E9"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp" />
-
-    </LinearLayout>
-
-    <!-- Описание -->
     <TextView
             android:id="@+id/service_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Описание услуги"
             android:textSize="14sp"
-            android:textColor="#757575"
-            android:layout_marginBottom="16dp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:lineSpacingExtra="4dp" />
+            android:layout_marginTop="4dp" />
 
-    <!-- Информация о цене и времени -->
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="20dp">
+            android:layout_marginTop="8dp">
 
-        <LinearLayout
+        <TextView
+                android:id="@+id/service_price"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:textSize="14sp"
+                android:textColor="@color/black" />
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Стоимость"
-                    android:textSize="12sp"
-                    android:textColor="#9E9E9E" />
-
-            <TextView
-                    android:id="@+id/service_price"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1 500 руб."
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#2E7D32" />
-
-        </LinearLayout>
-
-        <LinearLayout
-                android:layout_width="wrap_content"
+        <TextView
+                android:id="@+id/service_duration"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end">
-
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Длительность"
-                    android:textSize="12sp"
-                    android:textColor="#9E9E9E" />
-
-            <TextView
-                    android:id="@+id/service_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="60 мин"
-                    android:textSize="16sp"
-                    android:textColor="#212121" />
-
-        </LinearLayout>
-
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black" />
     </LinearLayout>
 
-    <!-- Кнопка -->
-    <Button
-            android:id="@+id/add_to_cart_button"
+    <TextView
+            android:id="@+id/service_category"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:text="Добавить в корзину"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:background="#2196F3" />
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:layout_marginTop="4dp" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+        <Button
+                android:id="@+id/add_to_cart_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="В корзину"
+                android:textColor="@color/white"
+                android:backgroundTint="?attr/colorPrimary" />
+
+        <ImageButton
+                android:id="@+id/edit_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:visibility="gone"
+                android:layout_marginStart="8dp" />
+
+        <ImageButton
+                android:id="@+id/delete_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:visibility="gone"
+                android:layout_marginStart="8dp" />
+    </LinearLayout>
 
 </LinearLayout>
